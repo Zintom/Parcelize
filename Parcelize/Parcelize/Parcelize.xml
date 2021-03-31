@@ -4,6 +4,17 @@
         <name>Parcelize</name>
     </assembly>
     <members>
+        <member name="T:Zintom.Parcelize.Helpers.ArrayHelpers">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Zintom.Parcelize.Helpers.ArrayHelpers.CombineArrays(System.Byte[][])">
+            <summary>
+            Combines the given <paramref name="arrays"/> into one large array.
+            </summary>
+            <returns>The <paramref name="arrays"/> combined as one.</returns>
+        </member>
         <member name="F:Zintom.Parcelize.ParcelItemTypeCode.Point">
             <summary>
             A <see cref="!:Microsoft.Xna.Framework.Point"/>
