@@ -15,10 +15,8 @@
     <PackageLicenseExpression></PackageLicenseExpression>
     <Copyright>Copyright © 2021</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>Nullable API support.
-
-Proper null handling, no longer crashes when a null item is inserted.</PackageReleaseNotes>
+    <Version>1.0.2</Version>
+    <PackageReleaseNotes>Exposed helper functionality under the '.Helpers' namespace.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
