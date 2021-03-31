@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Zintom.Parcelize
 {
-    public enum ParcelItemTypeCode
+    enum ParcelItemTypeCode
     {
         Empty = 0,
         Object = 1,
@@ -40,85 +40,104 @@ namespace Zintom.Parcelize
     /// </summary>
     public interface IParcelable
     {
+        /// <summary>
+        /// Converts the current object into its <see cref="Parcel"/> form.
+        /// </summary>
+        /// <remarks><b>Implementors:</b> Please provide a '<c>public static YourType.FromParcel()</c>' method in order for callers to be able to deserialize your object.</remarks>
         public Parcel ToParcel();
     }
 
     /// <summary>
     /// An easy way to store, transmit, and read primitives and <see cref="IParcelable"/>'s.
     /// </summary>
+    /// <remarks>Not currently thread-safe (specifically with <see cref="ReadNext"/> or <see cref="ReadNext{T}"/>)</remarks>
     public class Parcel
     {
 
-        private readonly List<object> _values = new();
-
-        public Parcel WriteInt(int value)
-        {
-            _values.Add(value);
-            return this;
-        }
-
-        public Parcel WriteFloat(float value)
-        {
-            _values.Add(value);
-            return this;
-        }
-
-        public Parcel WriteString(string value)
-        {
-            _values.Add(value);
-            return this;
-        }
-
-        public Parcel WriteVector2(Vector2 value)
-        {
-            _values.Add(value);
-            return this;
-        }
+        private readonly List<object?> _values = new();
 
         /// <summary>
-        /// Parcelizes the given <paramref name="parcelable"/>. Use <c>YourType.FromParcel((<see cref="Parcel"/>)p.ReadNext())</c> to deserialize.
+        /// Inserts the given <paramref name="value"/> into the parcel.
         /// </summary>
-        /// <param name="parcelable"></param>
-        public Parcel WriteParcelable(IParcelable parcelable)
+        /// <param name="value">The variable that is inserted into the parcel (written when <see cref="Parcel.ToBytes"/> is called).</param>
+        /// <returns>The current <see cref="Parcel"/>, used for chaining calls.</returns>
+        public Parcel WriteInt(int? value)
         {
-            _values.Add(parcelable);
+            _values.Add(value);
             return this;
         }
 
-        public Parcel WriteParcel(Parcel parcel)
+        /// <inheritdoc cref="WriteInt(int?)"/>
+        public Parcel WriteFloat(float? value)
+        {
+            _values.Add(value);
+            return this;
+        }
+
+        /// <inheritdoc cref="WriteInt(int?)"/>
+        public Parcel WriteString(string? value)
+        {
+            _values.Add(value);
+            return this;
+        }
+
+        /// <inheritdoc cref="WriteInt(int?)"/>
+        public Parcel WriteVector2(Vector2? value)
+        {
+            _values.Add(value);
+            return this;
+        }
+
+        ///// <summary>
+        ///// Parcelizes the given <paramref name="parcelable"/>. Use <c>YourType.FromParcel((<see cref="Parcel"/>)p.ReadNext())</c> to deserialize.
+        ///// </summary>
+        ///// <param name="parcelable"></param>
+        //public Parcel WriteParcelable(IParcelable? parcelable)
+        //{
+        //    _values.Add(parcelable);
+        //    return this;
+        //}
+
+        /// <summary>
+        /// Writes the given <paramref name="parcel"/> as a sub-parcel to this <see cref="Parcel"/>
+        /// </summary>
+        /// <remarks>Use <c>YourType.FromParcel(p.ReadNext&lt;<see cref="Parcel"/>&gt;())</c> to deserialize.</remarks>
+        /// <param name="parcelable"></param>
+        public Parcel WriteParcel(Parcel? parcel)
         {
             _values.Add(parcel);
             return this;
         }
 
         /// <summary>
-        /// Reads the next value from the parcel.
+        /// Reads the next item from the parcel.
         /// </summary>
-        public object ReadNext()
+        public object? ReadNext()
         {
             if (_values.Count == 0) throw new Exception("No more items to read.");
 
-            object value = _values[0];
+            object? value = _values[0];
             _values.RemoveAt(0);
 
             return value;
         }
 
         /// <summary>
-        /// Reads the next value from the parcel.
+        /// Reads the next item from the parcel as <typeparamref name="T"/>.
         /// </summary>
-        public T ReadNext<T>()
+        /// <returns>The next <see langword="object"/> from the parcel, cast to a <typeparamref name="T"/>.</returns>
+        public T? ReadNext<T>()
         {
             if (_values.Count == 0) throw new Exception("No more items to read.");
 
-            object value = _values[0];
+            object? value = _values[0];
             _values.RemoveAt(0);
 
-            return (T)value;
+            return (T?)value;
         }
 
         /// <summary>
-        /// Converts the given <paramref name="source"/> bytes into their <see cref="Parcel"/> form.
+        /// Decodes the given <paramref name="source"/> bytes into a <see cref="Parcel"/>.
         /// </summary>
         public static Parcel FromBytes(ReadOnlySpan<byte> source)
         {
@@ -139,6 +158,13 @@ namespace Zintom.Parcelize
                 ReadOnlySpan<byte> itemBytes = source.Slice(bytesRead, length);
                 bytesRead += length;
 
+                if (type == ParcelItemTypeCode.Empty)
+                {
+                    // Empty type codes are treated as null.
+                    parcel._values.Add(null);
+                    continue;
+                }
+
                 switch (type)
                 {
                     case ParcelItemTypeCode.Int32:
@@ -157,8 +183,8 @@ namespace Zintom.Parcelize
                         parcel._values.Add(new Vector2(vecX, vecY));
                         break;
                     case ParcelItemTypeCode.Object:
-                        // We assume the object a Parcel as
-                        // that is the only non-primitive type that can be added into the Parcel.
+                        // We assume Object is Parcel as other special
+                        // cases will have been handled by now.
                         parcel._values.Add(Parcel.FromBytes(itemBytes));
                         break;
                 }
@@ -176,28 +202,40 @@ namespace Zintom.Parcelize
 
             for (int i = 0; i < _values.Count; i++)
             {
-                ParcelItemTypeCode type = (ParcelItemTypeCode)Type.GetTypeCode(_values[i].GetType());
+                object? value = _values[i];
+                ParcelItemTypeCode type = (ParcelItemTypeCode)Type.GetTypeCode(value?.GetType() ?? null);
 
                 if (type == ParcelItemTypeCode.Object)
                 {
-                    if (_values[i] is Vector2)
+                    if (value is Vector2)
                         type = ParcelItemTypeCode.Vector2;
                 }
 
                 byte[] typeAsBytes = BitConverter.GetBytes((int)type);
 
-                byte[] itemAsBytes =
-                    _values[i] is IParcelable parcelable
-                    ? parcelable.ToParcel().ToBytes()
-                    : _values[i] is Parcel parcel
-                    ? parcel.ToBytes()
-                    : _values[i] is Vector2 vector2
-                    ? Encoding.ASCII.GetBytes(vector2.X + "," + vector2.Y)
-                    : Encoding.ASCII.GetBytes(_values[i].ToString()!);
+                byte[] itemAsBytes;
+
+                if (value == null)
+                {
+                    itemAsBytes = Array.Empty<byte>();
+                }
+                else if (value is Parcel parcel)
+                {
+                    itemAsBytes = parcel.ToBytes();
+                }
+                else if (value is Vector2 vector2)
+                {
+                    itemAsBytes = Encoding.ASCII.GetBytes(vector2.X + "," + vector2.Y);
+                }
+                else
+                {
+                    // No specific encoding.
+                    itemAsBytes = Encoding.ASCII.GetBytes(value.ToString() ?? "");
+                }
 
                 byte[] length = BitConverter.GetBytes(itemAsBytes.Length);
 
-                // Each serialized parcel item is in the format: length, typecode, value
+                // Each serialized parcel item is in the order: length, typecode, value
 
                 jaggedByteArray[i] = ArrayHelpers.CombineArrays(length, typeAsBytes, itemAsBytes);
             }
