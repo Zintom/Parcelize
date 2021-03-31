@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Zintom.Parcelize</RootNamespace>
+    <Authors>Zintom</Authors>
+    <Company />
+    <Product>Parcelize</Product>
+    <Description>Provides an easy way to compose and decompose data 'parcels' which can be sent over a network as bytes.</Description>
+    <NeutralLanguage>en</NeutralLanguage>
+    <RepositoryUrl>https://github.com/Zintom/Parcelize</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <Copyright>Copyright © 2021</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+  
+</Project>
