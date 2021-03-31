@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parcelize</name>
+    </assembly>
+    <members>
+        <member name="F:Zintom.Parcelize.ParcelItemTypeCode.Point">
+            <summary>
+            A <see cref="!:Microsoft.Xna.Framework.Point"/>
+            </summary>
+        </member>
+        <member name="F:Zintom.Parcelize.ParcelItemTypeCode.Vector2">
+            <summary>
+            A <see cref="T:System.Numerics.Vector2"/>
+            </summary>
+        </member>
+        <member name="T:Zintom.Parcelize.IParcelable">
+            <summary>
+            This object can be parcelized.
+            </summary>
+        </member>
+        <member name="M:Zintom.Parcelize.IParcelable.ToParcel">
+            <summary>
+            Converts the current object into its <see cref="T:Zintom.Parcelize.Parcel"/> form.
+            </summary>
+            <remarks><b>Implementors:</b> Please provide a '<c>public static YourType.FromParcel()</c>' method in order for callers to be able to deserialize your object.</remarks>
+        </member>
+        <member name="T:Zintom.Parcelize.Parcel">
+            <summary>
+            An easy way to store, transmit, and read primitives and <see cref="T:Zintom.Parcelize.IParcelable"/>'s.
+            </summary>
+            <remarks>Not currently thread-safe (specifically with <see cref="M:Zintom.Parcelize.Parcel.ReadNext"/> or <see cref="M:Zintom.Parcelize.Parcel.ReadNext``1"/>)</remarks>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.WriteInt(System.Nullable{System.Int32})">
+            <summary>
+            Inserts the given <paramref name="value"/> into the parcel.
+            </summary>
+            <param name="value">The variable that is inserted into the parcel (written when <see cref="M:Zintom.Parcelize.Parcel.ToBytes"/> is called).</param>
+            <returns>The current <see cref="T:Zintom.Parcelize.Parcel"/>, used for chaining calls.</returns>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.WriteFloat(System.Nullable{System.Single})">
+            <inheritdoc cref="M:Zintom.Parcelize.Parcel.WriteInt(System.Nullable{System.Int32})"/>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.WriteString(System.String)">
+            <inheritdoc cref="M:Zintom.Parcelize.Parcel.WriteInt(System.Nullable{System.Int32})"/>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.WriteVector2(System.Nullable{System.Numerics.Vector2})">
+            <inheritdoc cref="M:Zintom.Parcelize.Parcel.WriteInt(System.Nullable{System.Int32})"/>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.WriteParcel(Zintom.Parcelize.Parcel)">
+            <summary>
+            Writes the given <paramref name="parcel"/> as a sub-parcel to this <see cref="T:Zintom.Parcelize.Parcel"/>
+            </summary>
+            <remarks>Use <c>YourType.FromParcel(p.ReadNext&lt;<see cref="T:Zintom.Parcelize.Parcel"/>&gt;())</c> to deserialize.</remarks>
+            <param name="parcelable"></param>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.ReadNext">
+            <summary>
+            Reads the next item from the parcel.
+            </summary>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.ReadNext``1">
+            <summary>
+            Reads the next item from the parcel as <typeparamref name="T"/>.
+            </summary>
+            <returns>The next <see langword="object"/> from the parcel, cast to a <typeparamref name="T"/>.</returns>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.FromBytes(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Decodes the given <paramref name="source"/> bytes into a <see cref="T:Zintom.Parcelize.Parcel"/>.
+            </summary>
+        </member>
+        <member name="M:Zintom.Parcelize.Parcel.ToBytes">
+            <summary>
+            Serializes this <see cref="T:Zintom.Parcelize.Parcel"/> into bytes.
+            </summary>
+        </member>
+    </members>
+</doc>
