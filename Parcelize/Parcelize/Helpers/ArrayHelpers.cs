@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Zintom.Parcelize
+namespace Zintom.Parcelize.Helpers
 {
-    internal static class ArrayHelpers
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class ArrayHelpers
     {
-        internal static byte[] CombineArrays(params byte[][] arrays)
+        /// <summary>
+        /// Combines the given <paramref name="arrays"/> into one large array.
+        /// </summary>
+        /// <returns>The <paramref name="arrays"/> combined as one.</returns>
+        public static byte[] CombineArrays(params byte[][] arrays)
         {
             int totalSize = 0;
             for (int i = 0; i < arrays.Length; i++)
